@@ -50,31 +50,31 @@ watch(
       />
     </Head>
 
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <nav class="bg-white border-b border-gray-200 shadow-md">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
+      <nav class="bg-gradient-to-r from-teal-50 via-emerald-50 to-cyan-50 border-b border-teal-200/40 shadow-sm">
         <!-- Primary Navigation Menu -->
-        <div class="mx-auto max-w px-6 sm:px-8 lg:px-10">
-          <div class="flex h-20 justify-between items-center">
+        <div class="mx-auto max-w px-3 sm:px-6 lg:px-8">
+          <div class="flex h-14 sm:h-16 justify-between items-center">
             <div class="flex">
               <!-- Logo - Uses App Settings if available, otherwise Company Info -->
-              <div class="flex shrink-0 items-center gap-4">
+              <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                 <Link
                   :href="route('dashboard')"
-                  class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
+                  class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity duration-200"
                 >
                   <!-- App Logo (from App Settings) takes priority -->
                   <img
                     v-if="$page.props.appSettings && $page.props.appSettings.app_logo"
                     :src="`/storage/${$page.props.appSettings.app_logo}`"
                     alt="App Logo"
-                    class="block h-12 w-auto"
+                    class="block h-8 sm:h-10 w-auto"
                   />
                   <!-- Fallback to Company Logo -->
                   <img
                     v-else-if="$page.props.companyInfo && $page.props.companyInfo.logo"
                     :src="`/storage/${$page.props.companyInfo.logo}`"
                     alt="Company Logo"
-                    class="block h-12 w-auto"
+                    class="block h-8 sm:h-10 w-auto"
                   />
                   <!-- Final fallback to default ApplicationLogo -->
                   <!-- <ApplicationLogo
@@ -85,7 +85,7 @@ watch(
                   <!-- App Name (from App Settings) takes priority over Company Name -->
                   <span
                     v-if="$page.props.appSettings && $page.props.appSettings.app_name"
-                    class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+                    class="text-base sm:text-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent"
                   >
                     {{ $page.props.appSettings.app_name }}
                   </span>
@@ -93,7 +93,7 @@ watch(
                     v-else-if="
                       $page.props.companyInfo && $page.props.companyInfo.company_name
                     "
-                    class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+                    class="text-base sm:text-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent"
                   >
                     {{ $page.props.companyInfo.company_name }}
                   </span>
@@ -111,30 +111,30 @@ watch(
                             </div> -->
             </div>
 
-            <div class="hidden sm:ms-6 sm:flex sm:items-center gap-4">
+            <div class="hidden sm:ms-4 sm:flex sm:items-center gap-2 sm:gap-3">
               <!-- User Profile Display -->
               <div
-                class="inline-flex items-center gap-3 h-12 px-4 rounded-lg border border-gray-200 bg-gradient-to-r from-white to-gray-50 shadow-sm"
+                class="inline-flex items-center gap-2 h-10 px-3 rounded-lg border border-teal-200/50 bg-gradient-to-r from-teal-50/50 to-emerald-50/50 shadow-sm"
               >
                 <div
-                  class="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-sm shadow-md"
+                  class="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white font-bold text-xs shadow-sm"
                 >
                   {{ $page.props.auth.user.name.charAt(0).toUpperCase() }}
                 </div>
                 <div class="flex flex-col justify-center">
-                  <span class="text-sm font-semibold text-gray-900 leading-tight">
+                  <span class="text-xs font-semibold text-gray-800 leading-tight">
                     {{ $page.props.auth.user.name }}
                   </span>
-                  <span class="text-xs text-gray-500 leading-tight">Logged in</span>
+                  <span class="text-[10px] text-gray-500 leading-tight">Logged in</span>
                 </div>
               </div>
 
               <!-- POS Button -->
               <Link
                 :href="route('sales.index')"
-                class="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg border border-blue-600 bg-blue-600 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:border-blue-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg border border-teal-600 bg-gradient-to-r from-teal-600 to-emerald-600 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:from-teal-700 hover:to-emerald-700 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 min-h-[44px] sm:min-h-0"
               >
-                <span class="text-lg">🏪</span>
+                <span class="text-base">🏪</span>
                 <span>POS</span>
               </Link>
 
@@ -143,10 +143,10 @@ watch(
                 :href="route('logout')"
                 method="post"
                 as="button"
-                class="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg border border-gray-600 bg-gray-600 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-gray-700 hover:border-gray-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                class="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-1 min-h-[44px] sm:min-h-0"
               >
                 <svg
-                  class="w-4 h-4"
+                  class="w-3.5 h-3.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -166,7 +166,7 @@ watch(
             <div class="-me-2 flex items-center sm:hidden">
               <button
                 @click="showingNavigationDropdown = !showingNavigationDropdown"
-                class="inline-flex items-center justify-center rounded-lg p-2.5 text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 transition-all duration-200 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 min-h-[44px] min-w-[44px]"
               >
                 <svg
                   class="h-6 w-6"
@@ -206,9 +206,9 @@ watch(
             block: showingNavigationDropdown,
             hidden: !showingNavigationDropdown,
           }"
-          class="sm:hidden"
+          class="sm:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-sm"
         >
-          <div class="space-y-1 pb-3 pt-2">
+          <div class="space-y-1 pb-2 pt-2">
             <ResponsiveNavLink
               :href="route('dashboard')"
               :active="route().current('dashboard')"
@@ -218,17 +218,17 @@ watch(
           </div>
 
           <!-- Responsive Settings Options -->
-          <div class="border-t border-gray-700 pb-1 pt-4">
+          <div class="border-t border-gray-200/50 pb-2 pt-3 bg-gradient-to-r from-teal-50/30 to-emerald-50/30">
             <div class="px-4">
-              <div class="text-base font-medium text-white">
+              <div class="text-sm font-semibold text-gray-800">
                 {{ $page.props.auth.user.name }}
               </div>
-              <div class="text-sm font-medium text-gray-400">
+              <div class="text-xs font-medium text-gray-600">
                 {{ $page.props.auth.user.email }}
               </div>
             </div>
 
-            <div class="mt-3 space-y-1">
+            <div class="mt-2 space-y-1">
               <ResponsiveNavLink :href="route('profile.edit')">
                 Profile
               </ResponsiveNavLink>

@@ -44,14 +44,14 @@ const currentYear = new Date().getFullYear();
     <div class="min-h-screen flex bg-gray-50">
       <!-- Left Column - Features Section -->
       <div
-        class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-12 flex-col justify-center"
+        class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-600 via-cyan-700 to-emerald-700 p-12 flex-col justify-center"
       >
         <div class="max-w-lg mx-auto">
           <!-- Logo/Brand -->
           <div class="mb-12">
             <div class="flex items-center space-x-3">
               <div
-                class="h-12 w-12 bg-indigo-600 rounded-xl flex items-center justify-center"
+                class="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30"
               >
                 <svg
                   class="h-7 w-7 text-white"
@@ -67,7 +67,7 @@ const currentYear = new Date().getFullYear();
                   />
                 </svg>
               </div>
-              <span class="text-2xl font-bold text-white">JPOS System</span>
+              <span class="text-2xl font-bold text-white">Online මුදලාලි</span>
             </div>
           </div>
 
@@ -75,7 +75,7 @@ const currentYear = new Date().getFullYear();
           <h1 class="text-4xl font-bold text-white mb-4">
             Powerful Point of Sale Solution
           </h1>
-          <p class="text-lg text-blue-100 mb-12">
+          <p class="text-lg text-teal-50 mb-12">
             Streamline your business operations with our comprehensive inventory and sales
             management system.
           </p>
@@ -106,7 +106,7 @@ const currentYear = new Date().getFullYear();
                 </div>
               </div>
               <h3 class="text-base font-semibold text-white mb-2">Real-time Analytics</h3>
-              <p class="text-sm text-blue-100">
+              <p class="text-sm text-teal-50">
                 Track sales, inventory, and performance metrics in real-time.
               </p>
             </div>
@@ -137,7 +137,7 @@ const currentYear = new Date().getFullYear();
               <h3 class="text-base font-semibold text-white mb-2">
                 Inventory Management
               </h3>
-              <p class="text-sm text-blue-100">
+              <p class="text-sm text-teal-50">
                 Efficiently manage stock levels and product transfers.
               </p>
             </div>
@@ -166,7 +166,7 @@ const currentYear = new Date().getFullYear();
                 </div>
               </div>
               <h3 class="text-base font-semibold text-white mb-2">Secure & Reliable</h3>
-              <p class="text-sm text-blue-100">
+              <p class="text-sm text-teal-50">
                 Enterprise-grade security with role-based access control.
               </p>
             </div>
@@ -195,7 +195,7 @@ const currentYear = new Date().getFullYear();
                 </div>
               </div>
               <h3 class="text-base font-semibold text-white mb-2">Financial Reports</h3>
-              <p class="text-sm text-blue-100">
+              <p class="text-sm text-teal-50">
                 Generate detailed financial reports for expenses and sales.
               </p>
             </div>
@@ -210,7 +210,7 @@ const currentYear = new Date().getFullYear();
           <div class="lg:hidden mb-8 text-center">
             <div class="inline-flex items-center space-x-3">
               <div
-                class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center"
+                class="h-10 w-10 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg"
               >
                 <svg
                   class="h-6 w-6 text-white"
@@ -226,12 +226,12 @@ const currentYear = new Date().getFullYear();
                   />
                 </svg>
               </div>
-              <span class="text-xl font-bold text-gray-900">JPOS System</span>
+              <span class="text-xl font-bold text-gray-900">Online මුදලාලි</span>
             </div>
           </div>
 
           <!-- Login Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 lg:p-10">
+          <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 lg:p-10">
             <!-- Header -->
             <div class="mb-8">
               <h2 class="text-3xl font-bold text-gray-900 mb-2">Sign In</h2>
@@ -241,11 +241,11 @@ const currentYear = new Date().getFullYear();
             <!-- Status Message -->
             <div
               v-if="status"
-              class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4"
+              class="mb-6 bg-teal-50 border border-teal-200 rounded-lg p-4"
             >
               <div class="flex items-center">
                 <svg
-                  class="h-5 w-5 text-green-600 mr-2"
+                  class="h-5 w-5 text-teal-600 mr-2"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -255,7 +255,7 @@ const currentYear = new Date().getFullYear();
                     clip-rule="evenodd"
                   />
                 </svg>
-                <p class="text-sm font-medium text-green-800">{{ status }}</p>
+                <p class="text-sm font-medium text-teal-800">{{ status }}</p>
               </div>
             </div>
 
@@ -271,7 +271,7 @@ const currentYear = new Date().getFullYear();
                 <TextInput
                   id="email"
                   type="email"
-                  class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
                   v-model="form.email"
                   required
                   autofocus
@@ -292,7 +292,7 @@ const currentYear = new Date().getFullYear();
                   <TextInput
                     id="password"
                     :type="showPassword ? 'text' : 'password'"
-                    class="block w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+                    class="block w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
                     v-model="form.password"
                     required
                     autocomplete="current-password"
@@ -347,7 +347,7 @@ const currentYear = new Date().getFullYear();
               <!-- Submit Button -->
               <div class="pt-2">
                 <PrimaryButton
-                  class="w-full flex justify-center items-center py-3.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm transition-all duration-200"
+                  class="w-full flex justify-center items-center py-3.5 px-4 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 shadow-lg hover:shadow-xl transition-all duration-200"
                   :class="{ 'opacity-50 cursor-not-allowed': form.processing }"
                   :disabled="form.processing"
                 >
@@ -381,7 +381,7 @@ const currentYear = new Date().getFullYear();
 
           <!-- Footer Text -->
           <p class="mt-8 text-center text-sm text-gray-500">
-            © {{ currentYear }} JPOS System. All rights reserved.
+            © {{ currentYear }} Online මුදලාලි. All rights reserved. | Design And Developed by Onemaxweb Solutions
           </p>
         </div>
       </div>
