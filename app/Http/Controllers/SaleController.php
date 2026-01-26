@@ -36,9 +36,11 @@ class SaleController extends Controller
             ->orderBy('name')
             ->get();
 
-  $customers = Customer::select('id', 'name')
+  $customers = Customer::select('id', 'name', 'email', 'phone_number', 'address')
     ->orderBy('id', 'desc')
     ->get();
+
+  $companyInformation = CompanyInformation::first();
 
 $brands = Brand::select('id', 'name')
     ->orderBy('id', 'desc')
@@ -100,6 +102,7 @@ $discounts = Discount::select('id', 'name')
             'discounts' => $discounts,
             'currencySymbol' => $currencySymbol,
             'quotations' => $quotations,
+            'companyInformation' => $companyInformation,
         ]);
     }
 

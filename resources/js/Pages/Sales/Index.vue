@@ -1022,6 +1022,7 @@ const props = defineProps({
   discounts: Array,
   billSetting: Object,
   quotations: Array,
+  companyInformation: Object,
 });
 
 const { goToShopsTab } = useDashboardNavigation();
@@ -1052,6 +1053,7 @@ const paymentAmount = ref(0);
 const completedInvoice = ref("");
 const completedSaleDate = ref("");
 const completedCustomer = ref("");
+const completedCustomerData = ref(null);
 const completedPaymentType = ref(0);
 const completedItems = ref([]);
 const completedTotal = ref("0.00");
@@ -1584,8 +1586,9 @@ const submitSale = () => {
   // Store sale data before submitting
   completedInvoice.value = form.invoice_no;
   completedSaleDate.value = form.sale_date;
-  completedCustomer.value =
-    props.customers.find((c) => c.id === form.customer_id)?.name || "";
+  const customerObj = props.customers.find((c) => c.id === form.customer_id);
+  completedCustomer.value = customerObj?.name || "";
+  completedCustomerData.value = customerObj || null;
   completedPaymentType.value =
     form.payments.length > 0 ? form.payments[0].payment_type : 0;
   completedItems.value = [...form.items];
@@ -1645,16 +1648,36 @@ const submitSale = () => {
 
 // Print receipt
 const printReceipt = () => {
-  const printWindow = window.open("", "_blank", "width=302,height=600");
+  const printWindow = window.open("", "_blank", "width=800,height=900");
 
   if (!printWindow) {
     alert("Please allow pop-ups to print receipt");
     return;
   }
 
-  const bill = props.billSetting || {};
-  const rawSize = (bill.print_size || "80mm").toString();
-  const width = rawSize.includes("58") ? "58mm" : "80mm";
+  const company = props.companyInformation || {};
+  const customer = completedCustomerData.value || {};
+  const currency = company.currency || page.props.currency || "$";
+  const invoiceNo = completedInvoice.value?.replace("INV-", "") || "";
+
+  // Calculate due date (same as invoice date for now)
+  const invoiceDate = completedSaleDate.value;
+  const dueDate = completedSaleDate.value;
+
+  // Format date to DD-MM-YYYY
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const paidAmount = parseFloat(completedPaid.value) || 0;
+  const totalAmount = parseFloat(completedNetAmount.value) || 0;
+  const balanceDue = parseFloat(completedBalance.value) || 0;
+  const status = balanceDue > 0 ? "Due" : "Paid";
 
   const receiptContent = `
         <!DOCTYPE html>
@@ -1662,16 +1685,18 @@ const printReceipt = () => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Receipt - ${completedInvoice.value}</title>
+            <title>Invoice - ${invoiceNo}</title>
             <style>
                 @page {
-                    size: ${width} auto;
-                    margin: 0;
+                    size: A4;
+                    margin: 10mm;
                 }
                 @media print {
                     body {
                         margin: 0;
                         padding: 0;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
                 }
                 * {
@@ -1680,194 +1705,303 @@ const printReceipt = () => {
                     box-sizing: border-box;
                 }
                 body {
-                    font-family: 'Poppins', Poppins, monospace;
-                    font-size: 13px;
-                    width: ${width};
-                    margin: 0;
-                    padding: 3mm 5mm;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
                     background: white;
-                    color: #000;
+                    color: #333;
                     line-height: 1.4;
-                    font-weight: 700;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
+                    padding: 20px;
                 }
-                .receipt-container {
-                    width: 100%;
-                    max-width: 80mm;
+                .invoice-container {
+                    max-width: 800px;
+                    margin: 0 auto;
                 }
-                .header {
-                    text-align: center;
-                    margin-bottom: 8px;
-                    padding-bottom: 8px;
-                    border-bottom: 2px dashed #000;
-                }
-                .header h1 {
-                    font-size: 18px;
-                    font-weight: 900;
-                    margin-bottom: 4px;
-                    text-transform: uppercase;
-                    color: #000;
-                }
-                .header p {
-                    font-size: 12px;
-                    margin: 1px 0;
-                    line-height: 1.3;
-                    font-weight: 600;
-                    color: #000;
-                }
-                .info {
-                    margin: 8px 0;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #000;
-                }
-                .info-row {
+                .invoice-header {
                     display: flex;
                     justify-content: space-between;
-                    margin: 2px 0;
-                    line-height: 1.3;
-                    color: #000;
+                    align-items: flex-start;
+                    margin-bottom: 20px;
+                    padding-bottom: 15px;
+                    border-bottom: 3px solid #5a7a32;
                 }
-
+                .logo-section {
+                    display: flex;
+                    align-items: center;
+                }
+                .logo-section img {
+                    max-height: 60px;
+                    max-width: 150px;
+                    object-fit: contain;
+                }
+                .invoice-title-section {
+                    text-align: right;
+                }
+                .invoice-title {
+                    font-size: 28px;
+                    font-weight: bold;
+                    color: #5a7a32;
+                    margin-bottom: 10px;
+                }
+                .invoice-meta {
+                    font-size: 11px;
+                    color: #666;
+                }
+                .invoice-meta-row {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 30px;
+                    margin: 3px 0;
+                }
+                .invoice-meta-label {
+                    color: #666;
+                }
+                .invoice-meta-value {
+                    font-weight: bold;
+                    color: #333;
+                    min-width: 80px;
+                    text-align: right;
+                }
+                .info-section {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+                    gap: 40px;
+                }
+                .info-box {
+                    flex: 1;
+                    background: #f8f8f8;
+                    border: 1px solid #e0e0e0;
+                    border-top: 3px solid #5a7a32;
+                    padding: 15px;
+                }
+                .info-box-title {
+                    font-size: 11px;
+                    color: #666;
+                    margin-bottom: 10px;
+                    font-weight: normal;
+                }
+                .info-box-company {
+                    font-weight: bold;
+                    color: #5a7a32;
+                    font-size: 13px;
+                    margin-bottom: 8px;
+                }
+                .info-box-details {
+                    font-size: 11px;
+                    color: #333;
+                    line-height: 1.6;
+                }
                 .items-table {
                     width: 100%;
-                    margin: 8px 0;
-                    font-size: 12px;
                     border-collapse: collapse;
-                    font-weight: 600;
-                    color: #000;
+                    margin-bottom: 20px;
+                }
+                .items-table thead {
+                    background: #5a7a32;
+                    color: white;
                 }
                 .items-table th {
+                    padding: 10px 8px;
                     text-align: left;
-                    border-bottom: 2px solid #000;
-                    padding: 3px 2px;
-                    font-weight: 800;
-                    color: #000;
+                    font-weight: bold;
+                    font-size: 11px;
+                }
+                .items-table th:first-child {
+                    width: 5%;
+                    text-align: center;
+                }
+                .items-table th:nth-child(2) {
+                    width: 50%;
+                }
+                .items-table th:nth-child(3),
+                .items-table th:nth-child(4),
+                .items-table th:nth-child(5) {
+                    text-align: right;
                 }
                 .items-table td {
-                    padding: 3px 2px;
-                    border-bottom: 1px dotted #000;
-                    vertical-align: top;
-                    font-weight: 600;
-                    color: #000;
+                    padding: 10px 8px;
+                    border-bottom: 1px solid #e0e0e0;
+                    font-size: 11px;
                 }
-                .item-name {
-                    width: 38%;
-                    word-wrap: break-word;
-                }
-                .item-qty {
-                    width: 12%;
+                .items-table td:first-child {
                     text-align: center;
                 }
-                .item-price {
-                    width: 25%;
+                .items-table td:nth-child(3),
+                .items-table td:nth-child(4),
+                .items-table td:nth-child(5) {
                     text-align: right;
                 }
-                .item-total {
-                    width: 25%;
-                    text-align: right;
-                }
-                .totals {
-                    margin-top: 8px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #000;
-                }
-                .total-row {
+                .summary-section {
                     display: flex;
                     justify-content: space-between;
-                    margin: 3px 0;
-                    line-height: 1.4;
-                    font-weight: 700;
-                    color: #000;
+                    gap: 30px;
+                    margin-bottom: 20px;
                 }
-                .total-row.grand {
-                    font-size: 15px;
-                    font-weight: 900;
-                    border-top: 2px solid #000;
-                    border-bottom: 2px solid #000;
-                    padding: 6px 0;
-                    margin: 8px 0;
-                    color: #000;
+                .status-box {
+                    flex: 1;
+                    padding: 15px;
+                    border: 1px solid #e0e0e0;
                 }
-                .footer {
-                    text-align: center;
-                    margin-top: 12px;
-                    padding-top: 8px;
-                    border-top: 2px dashed #000;
+                .status-label {
                     font-size: 12px;
-                    font-weight: 600;
-                    color: #000;
+                    margin-bottom: 5px;
                 }
-                .footer p {
+                .status-value {
+                    font-size: 11px;
+                    color: #333;
+                }
+                .status-due {
+                    color: #c0392b;
+                    font-weight: bold;
+                }
+                .status-paid {
+                    color: #27ae60;
+                    font-weight: bold;
+                }
+                .summary-box {
+                    flex: 1;
+                    border: 1px solid #e0e0e0;
+                }
+                .summary-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 15px;
+                    border-bottom: 1px solid #e0e0e0;
+                    font-size: 11px;
+                }
+                .summary-row:last-child {
+                    border-bottom: none;
+                }
+                .summary-row.balance {
+                    background: #5a7a32;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 13px;
+                }
+                .summary-label {
+                    color: #666;
+                }
+                .summary-value {
+                    font-weight: bold;
+                }
+                .terms-section {
+                    margin-top: 20px;
+                    padding-top: 15px;
+                    border-top: 1px solid #e0e0e0;
+                }
+                .terms-title {
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                    font-size: 12px;
+                }
+                .terms-payment-info {
+                    font-size: 11px;
+                    color: #333;
+                    margin-bottom: 10px;
+                    line-height: 1.8;
+                }
+                .terms-payment-info p {
                     margin: 2px 0;
-                    line-height: 1.3;
-                    color: #000;
+                }
+                .terms-content {
+                    font-size: 10px;
+                    color: #666;
+                    line-height: 1.6;
+                }
+                .signature-section {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 40px;
+                    padding-top: 20px;
+                }
+                .signature-box {
+                    text-align: center;
+                    font-size: 10px;
+                    color: #666;
+                }
+                .signature-line {
+                    border-top: 1px dotted #999;
+                    padding-top: 5px;
+                    min-width: 150px;
+                }
+                .footer-note {
+                    text-align: right;
+                    font-size: 9px;
+                    color: #999;
+                    margin-top: 20px;
                 }
             </style>
         </head>
         <body>
-            <div class="receipt-container">
-                <div class="header">
-                    ${
-                      bill.logo_path
-                        ? `<div style="margin-bottom:6px;"><img src="/storage/${bill.logo_path}" alt="logo" style="max-height:40px; max-width:100%; object-fit:contain;"/></div>`
-                        : ""
-                    }
-                    <h1>${bill.company_name || "SALES RECEIPT"}</h1>
-                    ${bill.address ? `<p>${bill.address}</p>` : ""}
-                    ${
-                      bill.mobile_1 || bill.mobile_2
-                        ? `<p>Tel: ${[bill.mobile_1, bill.mobile_2]
-                            .filter(Boolean)
-                            .join(" / ")}</p>`
-                        : ""
-                    }
-                    ${bill.email ? `<p>${bill.email}</p>` : ""}
-                    ${bill.website_url ? `<p>${bill.website_url}</p>` : ""}
-                </div>
-
-                <div class="info">
-                    <div class="info-row">
-                        <span><strong>Invoice:</strong></span>
-                        <span>${completedInvoice.value}</span>
+            <div class="invoice-container">
+                <!-- Header -->
+                <div class="invoice-header">
+                    <div class="logo-section">
+                        <img src="/images/logo.png" alt="Logo" onerror="this.style.display='none'"/>
                     </div>
-                    <div class="info-row">
-                        <span><strong>Date:</strong></span>
-                        <span>${completedSaleDate.value}</span>
-                    </div>
-                    <div class="info-row">
-                        <span><strong>Customer:</strong></span>
-                        <span>${completedCustomer.value}</span>
-                    </div>
-                    <div class="info-row">
-                        <span><strong>Payment:</strong></span>
-                        <span>${getPaymentTypeText(completedPaymentType.value)}</span>
+                    <div class="invoice-title-section">
+                        <div class="invoice-title">Invoice</div>
+                        <div class="invoice-meta">
+                            <div class="invoice-meta-row">
+                                <span class="invoice-meta-label">Invoice No</span>
+                                <span class="invoice-meta-value">${invoiceNo}</span>
+                            </div>
+                            <div class="invoice-meta-row">
+                                <span class="invoice-meta-label">Invoice Date</span>
+                                <span class="invoice-meta-value">${formatDate(invoiceDate)}</span>
+                            </div>
+                            <div class="invoice-meta-row">
+                                <span class="invoice-meta-label">Due Date</span>
+                                <span class="invoice-meta-value">${formatDate(dueDate)}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Company & Customer Info -->
+                <div class="info-section">
+                    <div class="info-box">
+                        <div class="info-box-title">Our Info:</div>
+                        <div class="info-box-company">${company.company_name || "Company Name"}</div>
+                        <div class="info-box-details">
+                            ${company.address ? `${company.address}<br>` : ""}
+                            ${company.phone ? `Phone: ${company.phone}<br>` : ""}
+                            ${company.email ? `Email: ${company.email}<br>` : ""}
+                            ${company.website ? `Website: ${company.website}` : ""}
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-box-title">Customer:</div>
+                        <div class="info-box-company">${customer.name || "Walk-in Customer"}</div>
+                        <div class="info-box-details">
+                            ${customer.address ? `${customer.address}<br>` : ""}
+                            ${customer.phone_number ? `Phone: ${customer.phone_number}<br>` : ""}
+                            ${customer.email ? `Email: ${customer.email}` : ""}
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Items Table -->
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th class="item-name">Item</th>
-                            <th class="item-qty">Qty</th>
-                            <th class="item-price">Price</th>
-                            <th class="item-total">Total</th>
+                            <th>#</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>SubTotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${completedItems.value
                           .map(
-                            (item) => `
+                            (item, index) => `
                             <tr>
-                                <td class="item-name">${item.product_name}</td>
-                                <td class="item-qty">${item.quantity}</td>
-                                <td class="item-price">${item.price.toFixed(2)}</td>
-                                <td class="item-total">${(
-                                  item.price * item.quantity
-                                ).toFixed(2)}</td>
+                                <td>${index + 1}</td>
+                                <td>${item.product_name}</td>
+                                <td>${currency} ${item.price.toFixed(2)}</td>
+                                <td>${item.quantity}</td>
+                                <td>${currency} ${(item.price * item.quantity).toFixed(2)}</td>
                             </tr>
                         `
                           )
@@ -1875,68 +2009,77 @@ const printReceipt = () => {
                     </tbody>
                 </table>
 
-
-                <div class="totals">
-                    <div class="total-row">
-                        <span>Subtotal:</span>
-                        <span>${page.props.currency || "Rs."} ${
-    completedTotal.value
-  }</span>
+                <!-- Status & Summary -->
+                <div class="summary-section">
+                    <div class="status-box">
+                        <div class="status-label"><strong>Status:</strong> <span class="${status === 'Due' ? 'status-due' : 'status-paid'}">${status}</span></div>
+                        <div class="status-value">Total Amount: ${currency} ${totalAmount.toFixed(2)}</div>
+                        <div class="status-value">Paid Amount: ${currency} ${paidAmount.toFixed(2)}</div>
                     </div>
-                    ${
-                      parseFloat(completedProductDiscount.value) > 0
-                        ? `
-                    <div class="total-row" style="color: green;">
-                        <span>Product Discounts:</span>
-                        <span>- ${page.props.currency || "Rs."} ${
-                            completedProductDiscount.value
-                          }</span>
-                    </div>
-                    `
-                        : ""
-                    }
-                    ${
-                      parseFloat(completedDiscount.value) > 0
-                        ? `
-                    <div class="total-row">
-                        <span>Custom Discount:</span>
-                        <span>- ${page.props.currency || "Rs."} ${
-                            completedDiscount.value
-                          }</span>
-                    </div>
-                    `
-                        : ""
-                    }
-                    <div class="total-row grand">
-                        <span>GRAND TOTAL:</span>
-                        <span>${page.props.currency || "Rs."} ${
-    completedNetAmount.value
-  }</span>
-                    </div>
-                    <div class="total-row">
-                        <span>Paid Amount:</span>
-                        <span>${page.props.currency || "Rs."} ${
-    completedPaid.value
-  }</span>
-                    </div>
-                    <div class="total-row" style="font-weight: bold;">
-                        <span>${
-                          parseFloat(completedBalance.value) > 0
-                            ? "Balance Due:"
-                            : "Change:"
-                        }</span>
-                        <span>${page.props.currency || "Rs."} ${Math.abs(
-    parseFloat(completedBalance.value)
-  ).toFixed(2)}</span>
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span class="summary-label"><strong>Summary:</strong></span>
+                            <span></span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">SubTotal:</span>
+                            <span class="summary-value">${currency} ${completedTotal.value}</span>
+                        </div>
+                        ${
+                          parseFloat(completedProductDiscount.value) > 0
+                            ? `
+                        <div class="summary-row">
+                            <span class="summary-label">Product Discount:</span>
+                            <span class="summary-value">- ${currency} ${completedProductDiscount.value}</span>
+                        </div>
+                        `
+                            : ""
+                        }
+                        ${
+                          parseFloat(completedDiscount.value) > 0
+                            ? `
+                        <div class="summary-row">
+                            <span class="summary-label">Custom Discount:</span>
+                            <span class="summary-value">- ${currency} ${completedDiscount.value}</span>
+                        </div>
+                        `
+                            : ""
+                        }
+                        <div class="summary-row balance">
+                            <span>Balance Due:</span>
+                            <span>${currency} ${balanceDue > 0 ? balanceDue.toFixed(2) : "0.00"}</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="footer">
+                <!-- Terms -->
+                <div class="terms-section">
+                    <div class="terms-title">Terms</div>
+                    <div class="terms-payment-info">
+                        <p><strong>PAYNOW</strong>: UEN: ${company.uen || ""}</p>
+                        <p><strong>DIRECT TRANSFER</strong>. ${company.bank_name || ""}. A/C. ${company.bank_account || ""}</p>
+                    </div>
+                    <div class="terms-content">
+                        All cheques should be crossed and made payable to "<strong>${company.company_name || "Company Name"}</strong>".
+                        No claims for damage or shortage will be entertained unless the delivery receipt is endorsed by you accordingly.
+                    </div>
+                </div>
 
-                    <p>
-                        ${bill.footer_description || "Please visit us again!"}
-                        </p>
-                    <p style="margin-top: 6px; font-size: 9px;">Powered by POS System</p>
+                <!-- Signature -->
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <div>Date & Stamp</div>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line">Issued by ……………………………</div>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line">Received By ……………………………</div>
+                    </div>
+                </div>
+
+                <div class="footer-note">
+                    1/1 #${invoiceNo}
                 </div>
             </div>
 
